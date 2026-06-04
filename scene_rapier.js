@@ -8,8 +8,7 @@
 
   // ─── Scene ─────────────────────────────────────────────────────────────────
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x87ceeb);
-  scene.fog = new THREE.Fog(0x87ceeb, 30, 60);
+  scene.background = new THREE.Color(0xb0e0ff);
 
   const W = window.innerWidth, H = window.innerHeight;
   const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 200);
@@ -21,6 +20,13 @@
   renderer.setSize(W, H);
   renderer.shadowMap.enabled = true;
   document.body.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.maxPolarAngle = Math.PI / 2 - 0.05;
+  controls.update();
 
 
   // ─── Lights ────────────────────────────────────────────────────────────────
@@ -53,9 +59,10 @@
   scene.add(grid);
 
 
-  // ─── Fences (visual only; Rapier uses inner wall colliders) ────────────────
+  // ─── Fences ────────────────────────────────────────────────────────────────
   const FENCE_H = 1.5;
   const FENCE_T = 0.4;
+  const FENCE_L = ARENA + 0.4;
   function makeFence(x, z, w, d) {
     const mesh = new THREE.Mesh(
       new THREE.BoxGeometry(w, FENCE_H, d),
@@ -66,10 +73,10 @@
     mesh.receiveShadow = true;
     scene.add(mesh);
   }
-  makeFence(0, -HALF, ARENA, FENCE_T);
-  makeFence(0, HALF, ARENA, FENCE_T);
-  makeFence(-HALF, 0, FENCE_T, ARENA);
-  makeFence(HALF, 0, FENCE_T, ARENA);
+  makeFence(0, -HALF, FENCE_L, FENCE_T);
+  makeFence(0, HALF, FENCE_L, FENCE_T);
+  makeFence(-HALF, 0, FENCE_T, FENCE_L);
+  makeFence(HALF, 0, FENCE_T, FENCE_L);
 
   const INNER = HALF - FENCE_T / 2;
 
@@ -262,6 +269,7 @@
     world.timestep = DT;
     world.step();
     syncMeshes();
+    controls.update();
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   }

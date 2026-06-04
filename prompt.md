@@ -2,7 +2,7 @@
 
 ## Contexte et objectif
 
-Développe un jeu de voiture 3D dans le navigateur, **single-player, entièrement local**, inspiré de Trackmania : circuits en boucle chronométrés, physique réaliste, sensation de vitesse, support d'assets 3D réalistes importés depuis Blender ou Sketchfab. Le jeu doit tourner entièrement en frontend (SPA HTML simple + JS). Les données seront stockées dans `localStorage`/`IndexedDB`. Il y aura deux modes de jeu : soit par un humain, soit par un réseau de neurones pytorch qui s'entrainnera à conduire par Reinforcement Learning. La partie jeu sera dans le dossier game/, la partie python sera dans un dossier ai/. N'écrit pas les fichiers de la partie python, mais fait un controlleur utilisable par l'ia via Websocket.
+Développe un jeu de voiture 3D dans le navigateur, **single-player, entièrement local**, inspiré de Trackmania : circuits en boucle chronométrés, physique réaliste, sensation de vitesse, support d'assets 3D réalistes importés depuis Blender ou Sketchfab. L'environnement et les circuits doivent être visuellement cohérents et beaux. Le jeu doit tourner entièrement en frontend (SPA HTML simple + JS). Les données seront stockées dans `localStorage`/`IndexedDB`. Il y aura deux modes de jeu : soit par un humain, soit par un réseau de neurones pytorch qui s'entrainnera à conduire par Reinforcement Learning. La partie jeu sera dans le dossier game/, la partie python sera dans un dossier ai/. **N'écrit pas les fichiers de la partie python (ai/)**, mais fait un fichier controlleur avec HumanController et un AIControler communiquant via un serveur python Websocket.
 
 ---
 
@@ -47,7 +47,7 @@ game/
 
 Implémenter une dynamique des véhicules réaliste et satisfaisante à l'aide d'un **modèle de véhicule par raycasting**.
 
-Utilise le **`VehicleController` de Rapier.js** (implémentation Raycast Vehicle, standard AAA) :
+Utiliser le **`VehicleController` de Rapier.js** (implémentation Raycast Vehicle, standard AAA) :
 
 - **Steering** : angle max ≈ 35°, retour au centre progressif (`lerpAngle`), réduction de l'angle de braquage à haute vitesse.
 - **Moteur** : courbe d'accélération smooth réaliste, vitesse maximale, approximation simple de la vitesse de rotation/du couple.
@@ -98,27 +98,11 @@ Laisser la possibilité de l'activer/désactiver pour des raisons de performance
 
 ### Circuits
 
-- Les différents circuits seront stockés dans entities/tracks/track_1, track_2 etc. Dans chaque fichier, les informations suivantes seront présentes : la surface du terrain, le tracé du cricuit, les barrières autour du circuit, les positions et orientations des objects posés autour du circuit (arbres etc. en fichier .glb), le sky background, les lights, la gravité etc.
+- Les différents circuits seront stockés dans entities/tracks/track_1, track_2 etc. Dans chaque fichier, les informations suivantes seront présentes : la surface du terrain, le tracé du cricuit, les barrières autour du circuit, les positions et orientations des objects d'environnement posés autour du circuit (arbres etc. stockés en fichier .glb dans public/models/), le sky background, les lights, la gravité etc.
 - Les collisions Rapier sont générés automatiquement depuis les meshes via `ColliderDesc.trimesh()`
 - Construire au moins **un circuit de démonstration complet** comprenant : une ligne de départ, un circuit, une ligne d'arrivée.
 - Géométrie de collision dérivée du maillage du circuit (utiliser des colliders trimesh issus du glTF, ou des maillages de collision simplifiés).
 - Skybox + sol/environnement pour le contexte visuel.
-
----
-
-## Gameplay — mécaniques Trackmania
-
-### Timer 
-- Timer visible dès le départ (format `mm:ss.mmm`)
-- Circuit en boucle : Compteur de tours (ex : 3 laps)
-- Affichage du delta au meilleur temps précédent (+/- XX.XXX)
-
-### Respawn
-- Détection de voiture retournée pendant > 2s
-- Respawn au début avec vitesse nulle (animation de fondu)
-
-### Reset instantané
-- Touche `R` → replace la voiture au début immédiatement
 
 ---
 
@@ -148,6 +132,22 @@ Implémenter 3 modes de caméra toggleables avec `C` :
 
 ---
 
+## Gameplay — mécaniques Trackmania
+
+### Timer 
+- Timer visible dès le départ (format `mm:ss.mmm`)
+- Circuit en boucle : Compteur de tours (ex : 3 laps)
+- Affichage du delta au meilleur temps précédent (+/- XX.XXX)
+
+### Respawn
+- Détection de voiture retournée pendant > 2s
+- Respawn au début du circuit avec vitesse nulle (animation de fondu)
+
+### Reset instantané
+- Touche `R` → replace la voiture au début immédiatement
+
+---
+
 ## HUD (DOM overlay, pas Three.js)
 
 **State/UI:** Lightweight — vanilla TS + HTML/CSS overlay. Keep the game loop decoupled from UI.
@@ -171,13 +171,17 @@ Interface overlay en HTML/CSS positionné en absolute sur le canvas :
 
 ## Menus
 
-### Main Menu
+### Menu principal : 
+
+Jouer, IA (inference/train), Editeur (de tracks)
+Ne code pas la partie IA et editeur, mais met dans le menu principal.
+
+Boucle de jeu : Menu principal → Sélection de la voiture → Sélection du circuit → Chargement → Compte à rebours (3-2-1-GO) → Course → Arrivée → Résultats.
+
 - Sélection de circuit (liste de GLB dans `public/models/tracks/`)
 - Sélection de voiture (liste de GLB dans `public/models/cars/`)
 - Affichage des meilleurs temps locaux (`localStorage`)
 
-## Boucle de jeu et fonctionnalités
-- **Étapes du jeu :** Menu principal → Sélection de la voiture → Sélection du circuit → Chargement → Compte à rebours (3-2-1-GO) → Course → Arrivée → Résultats.
 
 ### Pause Menu (Escape)
 - Resume / Restart / Retour au menu
@@ -247,7 +251,7 @@ npm run build    # production build dans /dist
 4. Un fichier central `config.ts` pour régler les paramètres physiques, de caméra et graphiques.
 
 
-## Ordre de développement
+## Planning de développement
 1. Scaffold du projet + Vite + boucle de rendu Three.js + une première scène simple.
 2. Monde physique Rapier + plan de sol + véhicule raycast avec une voiture de remplacement (conduisible).
 3. Caméra de poursuite + entrées clavier.
@@ -266,7 +270,7 @@ Commencez par la phase 1 avec un plan clair, puis construisez progressivement. D
 
 
 
-## Idées suivantes : 
+## Prochaines étapes : 
 
 - Track : changements d'altitude, des virages inclinés, un saut/une rampe, et une boucle ou un boost pad si possible.
 - **4 roues** avec paramètres configurables : suspension travel, stiffness, damping, friction. Animation des roues : rotation de direction sur les roues avant + rotation de roulement sur toutes les roues en fonction de la vitesse.
@@ -280,7 +284,7 @@ Commencez par la phase 1 avec un plan clair, puis construisez progressivement. D
 - frein arrière différentiel pour le handbrake (touche Space)
 - Modèle de frottement des pneus avec adhérence longitudinale et latérale distinctes
 - Appui aérodynamique/traînée aérodynamique affectant la maniabilité à grande vitesse.
-- Audio
+- Audio/Musique/Effet sonores
 - Le circuit est un GLB unique exporté depuis Blender/Sketchfab. Nommer les meshes : `Track_Road`, `Track_Wall`, `Track_Decoration_*`, `Track_Ramp_*`
 
 Convention de nommage GLB (Blender) : Toutes les parties de la voiture doivent être nommées selon cette convention dans Blender avant export :
@@ -300,6 +304,5 @@ Car_Window_*      → vitres (shader transparent)
 ## Questions : 
 
 C'est quoi les commandes pour jouer à trackmania sur ordi ? 
-Menu principal : Jouer, IA (inference/train), Editeur
 dérapages ? mariokart ? Trackmania ? réalistes ?
 Demander quel algorithme de Reinforcement Learning est le plus adapté à ce jeu 

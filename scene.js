@@ -1,7 +1,6 @@
 // ─── Scene ─────────────────────────────────────────────────────────────────
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb, 30, 60);
+scene.background = new THREE.Color(0xb0e0ff);
 
 const W = window.innerWidth, H = window.innerHeight;
 const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 200);
@@ -13,6 +12,13 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(W, H);
 renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.maxPolarAngle = Math.PI / 2 - 0.05;
+controls.update();
 
 
 // ─── Lights ────────────────────────────────────────────────────────────────
@@ -68,7 +74,7 @@ makeFence(HALF, 0, FENCE_T, ARENA);   // east
 const INNER = HALF - FENCE_T / 2;
 
 
-// ─── Player (blue cube) ─────────────────────────────────────────────────────
+// ─── Blue cube (player) ─────────────────────────────────────────────────────
 const PLAYER_SIZE = 1;
 const PLAYER_HS = PLAYER_SIZE / 2;
 
@@ -80,7 +86,7 @@ player.position.set(0, PLAYER_HS, 0);
 player.castShadow = true;
 scene.add(player);
 
-const pv = { x: 0, z: 0 };          // player velocity
+const pv = { x: 0, z: 0 };         // player velocity
 const ACCEL = 0.1;
 const MAX_SPEED = 0.2;
 const FRICTION = 0.80;
@@ -261,12 +267,6 @@ function updateBalls() {
     ball.vz *= BALL_FRICTION;
     if (Math.abs(ball.vx) < 0.0005) ball.vx = 0;
     if (Math.abs(ball.vz) < 0.0005) ball.vz = 0;
-
-    // // Spin for visual flair
-    // if (ball.vx !== 0 || ball.vz !== 0) {
-    //   ball.mesh.rotation.z -= ball.vx / BALL_R;
-    //   ball.mesh.rotation.x += ball.vz / BALL_R;
-    // }
 
     ballVsFences(ball);
     ballVsGreens(ball);
