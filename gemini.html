@@ -214,11 +214,13 @@
             new THREE.Vector3(0, 0, 0)
         ], true);
 
+        // Profile width on Y (not X): ExtrudeGeometry aligns shape X with path tangent.
         const shape = new THREE.Shape();
-        shape.moveTo(-8, 0);
-        shape.lineTo(8, 0);
-        shape.lineTo(8, -0.5);
-        shape.lineTo(-8, -0.5);
+        shape.moveTo(0, -8);
+        shape.lineTo(0, 8);
+        shape.lineTo(-0.5, 8);
+        shape.lineTo(-0.5, -8);
+        shape.closePath();
 
         const extrudeSettings = { steps: 200, extrudePath: curve, bevelEnabled: false };
         const roadGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);

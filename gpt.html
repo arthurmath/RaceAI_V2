@@ -108,8 +108,11 @@
         <div class="speedwrap">
             <svg width="110" height="110" viewBox="0 0 110 110">
                 <circle cx="55" cy="55" r="42" stroke="rgba(255,255,255,0.14)" stroke-width="10" fill="none" />
-                <circle id="hud-speed-ring" cx="55" cy="55" r="42" stroke="rgba(120,220,255,0.95)" stroke-width="10" fill="none" stroke-linecap="round" transform="rotate(-90 55 55)" style="stroke-dasharray:0 263.893;" />
-                <circle id="hud-speed-fill" cx="55" cy="55" r="42" stroke="rgba(255,255,255,0.95)" stroke-width="10" fill="none" stroke-linecap="round" transform="rotate(-90 55 55)" style="opacity:0.0;" />
+                <circle id="hud-speed-ring" cx="55" cy="55" r="42" stroke="rgba(120,220,255,0.95)" stroke-width="10"
+                    fill="none" stroke-linecap="round" transform="rotate(-90 55 55)"
+                    style="stroke-dasharray:0 263.893;" />
+                <circle id="hud-speed-fill" cx="55" cy="55" r="42" stroke="rgba(255,255,255,0.95)" stroke-width="10"
+                    fill="none" stroke-linecap="round" transform="rotate(-90 55 55)" style="opacity:0.0;" />
             </svg>
             <div id="hud-speed">0 km/h</div>
         </div>
@@ -465,7 +468,7 @@
             steerTarget = 0;
             wheelRotation = 0;
 
-            maxSteerRad = THREE.MathUtils.degToRad(35);
+            maxSteerRad = THREE.MathUtils.degToRad(26);
             mass = 1180;
             engineForce = 12800;
             brakeForce = 18000;
@@ -603,8 +606,8 @@
                 const speed = this.speedMS();
                 const speedNorm = clamp(speed / 60, 0, 1);
 
-                this.steerTarget = (right - left) * this.maxSteerRad * (1 - 0.52 * speedNorm);
-                this.steering = lerpAngle(this.steering, this.steerTarget, 8.0 * dt);
+                this.steerTarget = (right - left) * this.maxSteerRad * (1 - 0.58 * speedNorm);
+                this.steering = lerpAngle(this.steering, this.steerTarget, 5.0 * dt);
 
                 this.forward.set(Math.sin(this.yaw), 0, Math.cos(this.yaw)).normalize();
                 this.right.set(this.forward.z, 0, -this.forward.x).normalize();
@@ -620,7 +623,7 @@
                 const lateral = this.right.dot(this.velocity);
 
                 const turnAuthority = clamp(Math.abs(longitudinal) / 18, 0.25, 1);
-                const yawRate = (longitudinal / 5.6) * Math.tan(this.steering) * turnAuthority;
+                const yawRate = (longitudinal / 6.8) * Math.tan(this.steering) * turnAuthority;
                 this.yaw += yawRate * dt;
 
                 this.forward.set(Math.sin(this.yaw), 0, Math.cos(this.yaw)).normalize();
@@ -768,7 +771,7 @@
                 this.composer.addPass(this.bloomPass);
 
                 this.blurPass = new AfterimagePass();
-                this.blurPass.uniforms['damp'].value = 0.9;
+                this.blurPass.uniforms['damp'].value = 0.1;
                 this.composer.addPass(this.blurPass);
             }
 
