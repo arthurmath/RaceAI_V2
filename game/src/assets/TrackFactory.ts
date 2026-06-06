@@ -12,6 +12,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 import * as THREE from 'three';
 import type { TrackDefinition } from '../entities/tracks/types';
 import type { VehicleSpawn } from '../physics/VehicleController';
+import { AssetLoader } from '../utils/AssetLoader';
 
 export interface BuiltTrack {
   group: THREE.Group;
@@ -31,9 +32,14 @@ export class TrackFactory {
   constructor(
     private readonly world: RAPIER.World,
     private readonly scene: THREE.Scene,
+    private readonly assetLoader?: AssetLoader,
   ) {}
 
-  build(def: TrackDefinition): BuiltTrack {
+  async build(def: TrackDefinition): Promise<BuiltTrack> {
+    // Quand un modèle GLB est fourni, les maillages visuels procéduraux sont
+    // masqués (le GLB remplace le visuel) mais les colliders physiques restent.
+    const useGLB = !!def.modelPath;
+
     const group = new THREE.Group();
     group.name = `track_${def.id}`;
 
@@ -67,17 +73,19 @@ export class TrackFactory {
     }
 
     // --- Route ---
-    this.buildRoad(group, trackBody, leftEdge, rightEdge, def);
+    this.buildRoad(group, trackBody, leftEdge, rightEdge, def, !useGLB);
 
     // --- Barrières ---
-    this.buildBarrier(group, trackBody, leftEdge, def.barrierHeight, 0x3344ff);
-    this.buildBarrier(group, trackBody, rightEdge, def.barrierHeight, 0xff3344);
+    this.buildBarrier(group, trackBody, leftEdge, def.barrierHeight, 0x3344ff, !useGLB);
+    this.buildBarrier(group, trackBody, rightEdge, def.barrierHeight, 0xff3344, !useGLB);
 
     // --- Sol ---
-    this.buildGround(group, trackBody, def);
+    this.buildGround(group, trackBody, def, !useGLB);
 
-    // --- Décor ---
-    this.buildDecorations(group, def);
+    // --- Décor (ignoré quand le GLB fournit l'environnement) ---
+    if (!useGLB) {
+      this.buildDecorations(group, def);
+    }
 
     // --- Ligne de départ / arrivée ---
     const startU = def.startU ?? 0;
@@ -92,6 +100,30 @@ export class TrackFactory {
       position: new THREE.Vector3(sp.x, sp.y + 1.2, sp.z),
       quaternion: spawnQuat,
     };
+
+    // --- Modèle GLB (environnement visuel) ---
+    if (useGLB && this.assetLoader) {
+      const gltf = await this.assetLoader.tryLoadGLB(def.modelPath!);
+      if (gltf) {
+        const modelGroup = gltf.scene.clone();
+        const scale = def.modelScale ?? 1;
+        modelGroup.scale.setScalar(scale);
+        modelGroup.traverse((obj) => {
+          if ((obj as THREE.Mesh).isMesh) {
+            obj.castShadow = true;
+            obj.receiveShadow = true;
+          }
+        });
+        group.add(modelGroup);
+      } else {
+        // Fallback : afficher le visuel procédural si le GLB est absent.
+        this.buildRoad(group, trackBody, leftEdge, rightEdge, def, true);
+        this.buildBarrier(group, trackBody, leftEdge, def.barrierHeight, 0x3344ff, true);
+        this.buildBarrier(group, trackBody, rightEdge, def.barrierHeight, 0xff3344, true);
+        this.buildGround(group, trackBody, def, true);
+        this.buildDecorations(group, def);
+      }
+    }
 
     this.scene.add(group);
 
@@ -134,6 +166,7 @@ export class TrackFactory {
     left: THREE.Vector3[],
     right: THREE.Vector3[],
     def: TrackDefinition,
+    visible: boolean,
   ): void {
     const N = left.length;
     const positions: number[] = [];
@@ -170,7 +203,7 @@ export class TrackFactory {
     });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
-    group.add(mesh);
+    if (visible) group.add(mesh);
 
     // Collider trimesh dérivé du maillage de la route.
     const collider = RAPIER.ColliderDesc.trimesh(
@@ -188,6 +221,7 @@ export class TrackFactory {
     edge: THREE.Vector3[],
     height: number,
     color: number,
+    visible: boolean,
   ): void {
     const N = edge.length;
     const positions: number[] = [];
@@ -221,7 +255,7 @@ export class TrackFactory {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    group.add(mesh);
+    if (visible) group.add(mesh);
 
     const collider = RAPIER.ColliderDesc.trimesh(
       new Float32Array(positions),
@@ -236,6 +270,7 @@ export class TrackFactory {
     group: THREE.Group,
     body: RAPIER.RigidBody,
     def: TrackDefinition,
+    visible: boolean,
   ): void {
     const size = def.groundSize;
     const geo = new THREE.PlaneGeometry(size, size, 1, 1);
@@ -244,7 +279,7 @@ export class TrackFactory {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.y = -0.02;
     mesh.receiveShadow = true;
-    group.add(mesh);
+    if (visible) group.add(mesh);
 
     // Collider sol : pavé fin (plus robuste qu'un demi-espace pour le raycast).
     const collider = RAPIER.ColliderDesc.cuboid(size / 2, 0.1, size / 2)

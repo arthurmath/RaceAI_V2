@@ -131,7 +131,7 @@ class App {
     const trackDef = getTrackById(this.selectedTrackId);
     const controller = new HumanController(this.input);
 
-    this.session = new RaceSession(this.scene.scene, this.lighting, vehicleConfig, trackDef, controller);
+    this.session = await RaceSession.create(this.scene.scene, this.lighting, vehicleConfig, trackDef, controller);
     this.menus.setProgress(1);
 
     await nextFrame();

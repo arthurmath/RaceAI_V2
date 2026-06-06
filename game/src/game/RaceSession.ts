@@ -9,6 +9,7 @@ import { PhysicsWorld } from '../physics/PhysicsWorld';
 import { VehicleController, type VehicleSpawn } from '../physics/VehicleController';
 import { TrackFactory, type BuiltTrack } from '../assets/TrackFactory';
 import { VehicleView } from '../assets/VehicleView';
+import { AssetLoader } from '../utils/AssetLoader';
 import { Race } from './Race';
 import type { VehicleConfig } from '../physics/vehicleConfig';
 import type { TrackDefinition } from '../entities/tracks/types';
@@ -25,6 +26,11 @@ export class RaceSession {
   readonly vehicle: VehicleController;
   readonly view: VehicleView;
   readonly race: Race;
+  readonly vehicleConfig: VehicleConfig;
+  readonly trackDef: TrackDefinition;
+
+  private readonly lighting: Lighting;
+  private readonly controller: Controller;
 
   private readonly prevPos = new THREE.Vector3();
   private readonly currPos = new THREE.Vector3();
@@ -40,17 +46,40 @@ export class RaceSession {
 
   private flippedTimer = 0;
 
-  constructor(
+  /**
+   * Factory asynchrone : construit le monde physique, le circuit
+   * (avec chargement GLB si modelPath est défini), puis le véhicule.
+   * Utilisez toujours cette méthode au lieu du constructeur direct.
+   */
+  static async create(
     scene: THREE.Scene,
-    private readonly lighting: Lighting,
-    readonly vehicleConfig: VehicleConfig,
-    readonly trackDef: TrackDefinition,
-    private readonly controller: Controller,
-  ) {
-    this.physics = new PhysicsWorld(trackDef.gravity);
+    lighting: Lighting,
+    vehicleConfig: VehicleConfig,
+    trackDef: TrackDefinition,
+    controller: Controller,
+  ): Promise<RaceSession> {
+    const physics = new PhysicsWorld(trackDef.gravity);
+    const assetLoader = new AssetLoader();
+    const factory = new TrackFactory(physics.world, scene, assetLoader);
+    const track = await factory.build(trackDef);
+    return new RaceSession(scene, lighting, vehicleConfig, trackDef, controller, physics, track);
+  }
 
-    const factory = new TrackFactory(this.physics.world, scene);
-    this.track = factory.build(trackDef);
+  private constructor(
+    scene: THREE.Scene,
+    lighting: Lighting,
+    vehicleConfig: VehicleConfig,
+    trackDef: TrackDefinition,
+    controller: Controller,
+    physics: PhysicsWorld,
+    track: BuiltTrack,
+  ) {
+    this.physics = physics;
+    this.track = track;
+    this.vehicleConfig = vehicleConfig;
+    this.trackDef = trackDef;
+    this.lighting = lighting;
+    this.controller = controller;
 
     const spawn: VehicleSpawn = this.track.spawn;
     this.vehicle = new VehicleController(this.physics.world, vehicleConfig, spawn);

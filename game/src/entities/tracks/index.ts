@@ -2,8 +2,9 @@
 import type { TrackDefinition } from './types';
 import { track_1 } from './track_1';
 import { track_2 } from './track_2';
+import { track_3 } from './track_3';
 
-export const TRACKS: TrackDefinition[] = [track_1, track_2];
+export const TRACKS: TrackDefinition[] = [track_1, track_2, track_3];
 
 export function getTrackById(id: string): TrackDefinition {
   const t = TRACKS.find((x) => x.id === id);

@@ -58,8 +58,10 @@ export interface TrackDefinition {
   lighting: TrackLighting;
   decorations: DecorationInstance[];
 
-  /** GLB optionnel : si fourni, remplace la génération procédurale. */
+  /** GLB optionnel : si fourni, remplace la génération procédurale visuelle. */
   modelPath?: string;
+  /** Facteur d'échelle appliqué au modèle GLB (1 par défaut). */
+  modelScale?: number;
 
   /** Position de départ le long de la courbe [0..1]. */
   startU?: number;
