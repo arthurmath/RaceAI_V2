@@ -2,7 +2,7 @@
 
 ## Contexte et objectif
 
-Développe un jeu de voiture 3D dans le navigateur, **single-player, entièrement local**, inspiré de Trackmania : circuits en boucle chronométrés, physique réaliste, sensation de vitesse. L'environnement et le circuit doivent être visuellement cohérents et beaux. Le jeu doit tourner entièrement en frontend (HTML simple + JS). 
+Développe un jeu de voiture 3D dans le navigateur, **single-player, entièrement local**, inspiré de Trackmania : circuits en boucle chronométrés, physique réaliste, sensation de vitesse. L'environnement et le circuit doivent être visuellement cohérents et beaux. Le jeu doit tourner entièrement en frontend, fais un unique fichier HTML. 
 
 ---
 
