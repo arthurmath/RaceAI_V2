@@ -75,4 +75,9 @@ export interface VehicleConfig {
    * Les autres roues du modèle restent figées.
    */
   steerWheelMeshNames?: string[];
+  /**
+   * Facteur appliqué à l'angle de braquage visuel des roues (1 = physique).
+   * Utile quand le mesh exagère l'angle réel.
+   */
+  visualSteerScale?: number;
 }

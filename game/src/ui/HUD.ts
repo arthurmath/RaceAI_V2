@@ -2,8 +2,8 @@
  * HUD — overlay DOM (découplé de la boucle de jeu) : tour, chrono, meilleur
  * temps, delta coloré et compteur de vitesse en arc SVG animé.
  */
-import type { RaceSnapshot } from '../game/Race';
-import { formatTime, formatDelta } from '../utils/format';
+import type { RaceSnapshot } from '../utils/Recorder';
+import { formatTime, formatDelta } from '../utils/helpers';
 
 const SPEEDO_MAX_KMH = 320;
 const ARC_RADIUS = 80;

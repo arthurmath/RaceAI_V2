@@ -5,7 +5,7 @@ import type { VehicleConfig } from '../types';
 
 export const car_1: VehicleConfig = {
   id: 'car_1',
-  name: 'Comet RS',
+  name: 'Training Car',
   color: 0x0a84ff,
   mass: 1000,
   chassisHalfExtents: { x: 0.85, y: 0.38, z: 1.95 },

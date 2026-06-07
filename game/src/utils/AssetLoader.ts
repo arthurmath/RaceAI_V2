@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { registerSpecularGlossinessExtension } from './GLTFGlossinessExtension';
 
 export type ProgressCallback = (loaded: number, total: number, url: string) => void;
 
@@ -33,6 +34,7 @@ export class AssetLoader {
     draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 
     this.gltfLoader = new GLTFLoader(this.manager);
+    registerSpecularGlossinessExtension(this.gltfLoader);
     this.gltfLoader.setDRACOLoader(draco);
     this.objLoader = new OBJLoader(this.manager);
   }

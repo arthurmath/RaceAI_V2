@@ -5,9 +5,9 @@
  */
 import type { VehicleConfig } from '../assets/cars/types';
 import type { TrackDefinition } from '../assets/tracks/types';
-import type { RaceSnapshot } from '../game/Race';
-import { formatTime } from '../utils/format';
-import { getBestTimeMs } from '../game/Storage';
+import type { RaceSnapshot } from '../utils/Recorder';
+import { formatTime } from '../utils/helpers';
+import { getBestTimeMs } from '../utils/Storage';
 
 export class Menus {
   private readonly container: HTMLElement;

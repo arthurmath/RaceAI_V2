@@ -14,7 +14,7 @@ import { PostProcessing } from './rendering/PostProcessing';
 import { GameLoop } from './core/GameLoop';
 import { InputManager } from './core/InputManager';
 import { HumanController } from './controllers/HumanController';
-import { RaceSession } from './game/RaceSession';
+import { RaceSession } from './core/RaceSession';
 import { Menus } from './ui/Menus';
 import { HUD } from './ui/HUD';
 import { Countdown } from './ui/Countdown';
