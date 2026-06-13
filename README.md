@@ -132,6 +132,9 @@ Chaque frame, `RaceSession` peut pousser une observation (position, capteurs ray
 
 ## Prochaines étapes : 
 
+- Ajouter en mode training AI un bouton arreter entrainement qui enregistre les poids.
+- Ajouter un mode warm start et cold start dans le menu après aovir cliqué sur IA (parce qu'au lancement du script ça charge des poids)
+
 - Track : changements d'altitude, des virages inclinés, un saut/une rampe, et une boucle ou un boost pad si possible.
 - **Plateformes de boost** et **surfaces modifiant la vitesse** (par exemple, zones à faible adhérence / de terre) en option.
 - **4 roues** avec paramètres configurables : suspension travel, stiffness, damping, friction. Animation des roues : rotation de direction sur les roues avant + rotation de roulement sur toutes les roues en fonction de la vitesse.
